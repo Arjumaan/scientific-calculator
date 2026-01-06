@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Scientific Calculator</title>
+    <!-- Updated path for static deployment -->
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="calculator">
+        <!-- Main Calculator Section (Left) -->
+        <div class="main-calc">
+            <div class="calc-header">
+                <h1>Scientific Calc</h1>
+                <button id="mode-toggle" class="btn-mode" onclick="toggleMode()">DEG</button>
+            </div>
+
+            <input id="display" type="text" placeholder="0" autocomplete="off">
+            <div id="result"></div>
+
+            <div class="keys-container">
+                <!-- Scientific Functions (Left side of keys) -->
+                <div class="scientific-pad">
+                    <button class="btn-function" onclick="appendInput('sin(')">sin</button>
+                    <button class="btn-function" onclick="appendInput('cos(')">cos</button>
+                    <button class="btn-function" onclick="appendInput('tan(')">tan</button>
+                    <button class="btn-function" onclick="appendInput('asin(')">sin⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('acos(')">cos⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('atan(')">tan⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('log10(')">log</button>
+                    <button class="btn-function" onclick="appendInput('log(')">ln</button>
+                    <button class="btn-function" onclick="appendInput('sqrt(')">√</button>
+                    <button class="btn-function" onclick="appendInput('^')">x^y</button>
+                    <button class="btn-function" onclick="appendInput('pi')">π</button>
+                    <button class="btn-function" onclick="appendInput('e')">e</button>
+                    <button class="btn-function" onclick="appendInput('(')">(</button>
+                    <button class="btn-function" onclick="appendInput(')')">)</button>
+                    <button class="btn-function" onclick="appendInput('abs(')">abs</button>
+                </div>
+
+                <!-- Number Pad & Operators (Right side of keys) -->
+                <div class="numpad">
+                    <button class="btn-clear" onclick="clearEntry()">CE</button>
+                    <button class="btn-clear" onclick="clearDisplay()">C</button>
+                    <button class="btn-delete" onclick="deleteLast()"><i class="fas fa-backspace"></i></button>
+                    <button class="btn-operator" onclick="appendInput('/')">÷</button>
+
+                    <button onclick="appendInput('7')">7</button>
+                    <button onclick="appendInput('8')">8</button>
+                    <button onclick="appendInput('9')">9</button>
+                    <button class="btn-operator" onclick="appendInput('*')">×</button>
+
+                    <button onclick="appendInput('4')">4</button>
+                    <button onclick="appendInput('5')">5</button>
+                    <button onclick="appendInput('6')">6</button>
+                    <button class="btn-operator" onclick="appendInput('-')">−</button>
+
+                    <button onclick="appendInput('1')">1</button>
+                    <button onclick="appendInput('2')">2</button>
+                    <button onclick="appendInput('3')">3</button>
+                    <button class="btn-operator" onclick="appendInput('+')">+</button>
+
+                    <button onclick="appendInput('0')" style="grid-column: span 2; border-radius: 30px;">0</button>
+                    <button onclick="appendInput('.')">.</button>
+                    <button id="equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Sidebar (Right) -->
+        <div class="history-panel">
+            <div class="history-head">
+                <h2>History Log</h2>
+                <button onclick="clearHistory()" title="Clear History"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <ul id="history-list" class="history-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const resultDiv = document.getElementById('result');
+        const historyList = document.getElementById('history-list');
+        const modeBtn = document.getElementById('mode-toggle');
+        let currentMode = 'deg'; // 'deg' or 'rad'
+        let history = [];
+
+        // Load history from localStorage
+        try {
+            const stored = localStorage.getItem('calc_history');
+            if (stored) {
+                history = JSON.parse(stored);
+            }
+        } catch (e) {
+            console.error("Could not load history", e);
+        }
+
+        function appendInput(value) {
+            display.value += value;
+            display.focus();
+        }
+
+        function toggleMode() {
+            if (currentMode === 'deg') {
+                currentMode = 'rad';
+                modeBtn.textContent = 'RAD';
+                modeBtn.style.color = '#ff9a9e';
+            } else {
+                currentMode = 'deg';
+                modeBtn.textContent = 'DEG';
+                modeBtn.style.color = '#00c6ff';
+            }
+        }
+
+        function clearDisplay() {
+            display.value = '';
+            resultDiv.textContent = '';
+            display.focus();
+        }
+
+        function clearEntry() {
+            display.value = '';
+            display.focus();
+        }
+
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+            display.focus();
+        }
+
+        /* Handle Enter key */
+        display.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                calculate();
+            }
+        });
+
+        function calculate() {
+            if (display.value.trim() === '') return;
+
+            resultDiv.textContent = 'Calculating...';
+            let expr = display.value;
+            let result = "";
+            let errorMsg = "";
+
+            try {
+                // Safety check (basic)
+                // In a client-side only app, malicious code only hurts the user themselves (XSS), 
+                // but we should still be careful if we ever persisted this or shared URLs.
+                // For a calculator, assuming direct user input.
+
+                // --- Math Environment Setup ---
+                // We define local functions to shadow global ones or add new ones
+                const PI = Math.PI;
+                const E = Math.E;
+                const pi = Math.PI;
+                const e = Math.E;
+
+                const abs = Math.abs;
+                const sqrt = Math.sqrt;
+                const log = Math.log;     // ln
+                const log10 = Math.log10; // log base 10
+
+                // Trignometry handling based on mode
+                const toRad = (x) => (currentMode === 'deg' ? x * (Math.PI / 180) : x);
+                const sin = (x) => Math.sin(toRad(x));
+                const cos = (x) => Math.cos(toRad(x));
+                const tan = (x) => Math.tan(toRad(x));
+
+                const asin = Math.asin;
+                const acos = Math.acos;
+                const atan = Math.atan;
+
+                // --- replacements ---
+                // Replace ^ with **
+                let evalExpr = expr.replace(/\^/g, '**');
+                // Replace π with pi (which is defined above)
+                evalExpr = evalExpr.replace(/π/g, 'pi');
+
+                // Sanitize: allow only safe characters roughly
+                // Allow letters, numbers, operators, parenthesis, dot, whitespace
+                if (!/^[\d\+\-\*\/\(\)\.\s\%a-zA-Z_]+$/.test(evalExpr)) {
+                    throw new Error("Invalid characters");
+                }
+
+                // Evaluate
+                // We use a Function constructor with the math keys in scope?
+                // Or just direct eval since we defined the vars in this scope?
+                // Direct eval picks up local variables (sin, cos, etc).
+                const calculated = eval(evalExpr);
+
+                // Format result
+                // Avoid long floats like 0.0000000000000004
+                // but keep precision.
+                result = String(calculated);
+                if (result === "NaN") throw new Error("Math Error");
+
+                // Styling success
+                resultDiv.textContent = '= ' + result;
+                resultDiv.style.color = '#00ff88';
+
+            } catch (err) {
+                // console.error(err);
+                result = "Error: " + err.message;
+                errorMsg = result;
+                resultDiv.textContent = result;
+                resultDiv.style.color = '#ff5b5b';
+            }
+
+            // Save history
+            addToHistory(expr, result);
+        }
+
+        function addToHistory(expression, result) {
+            // Add to beginning
+            history.unshift({ expression, result });
+            // Limit to 20
+            if (history.length > 20) history = history.slice(0, 20);
+
+            saveHistory();
+            renderHistory();
+        }
+
+        function saveHistory() {
+            localStorage.setItem('calc_history', JSON.stringify(history));
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            // Display history. 
+            // In the Python version it reversed it for display (newest first).
+            // We are already storing newest first with unshift.
+
+            history.forEach(item => {
+                const li = document.createElement('li');
+                const isError = item.result.toString().startsWith('Error');
+                const resultClass = isError ? 'res error' : 'res';
+
+                const exprText = item.expression ? item.expression : '(empty)';
+
+                li.innerHTML = `<span class="expr">${exprText}</span> <span class="${resultClass}">${item.result}</span>`;
+                li.onclick = () => {
+                    display.value = item.expression;
+                    display.focus();
+                };
+                li.title = "Click to reuse";
+                historyList.appendChild(li);
+            });
+            // Scroll mechanism - sidebar usually wants to stay at top or bottom?
+            // CSS says overflow: auto.
+        }
+
+        function clearHistory() {
+            history = [];
+            saveHistory();
+            renderHistory();
+        }
+
+        // Initial render
+        renderHistory();
+    </script>
+</body>
+
+</html>
