@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Scientific Calculator</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="calculator">
+        <!-- Main Calculator Section (Left) -->
+        <div class="main-calc">
+            <div class="calc-header">
+                <h1>Scientific Calc</h1>
+                <button id="mode-toggle" class="btn-mode" onclick="toggleMode()">DEG</button>
+            </div>
+
+            <input id="display" type="text" placeholder="0" autocomplete="off">
+            <div id="result"></div>
+
+            <div class="keys-container">
+                <!-- Scientific Functions (Left side of keys) -->
+                <div class="scientific-pad">
+                    <button class="btn-function" onclick="appendInput('sin(')">sin</button>
+                    <button class="btn-function" onclick="appendInput('cos(')">cos</button>
+                    <button class="btn-function" onclick="appendInput('tan(')">tan</button>
+                    <button class="btn-function" onclick="appendInput('asin(')">sin⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('acos(')">cos⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('atan(')">tan⁻¹</button>
+                    <button class="btn-function" onclick="appendInput('log10(')">log</button>
+                    <button class="btn-function" onclick="appendInput('log(')">ln</button>
+                    <button class="btn-function" onclick="appendInput('sqrt(')">√</button>
+                    <button class="btn-function" onclick="appendInput('^')">x^y</button>
+                    <button class="btn-function" onclick="appendInput('pi')">π</button>
+                    <button class="btn-function" onclick="appendInput('e')">e</button>
+                    <button class="btn-function" onclick="appendInput('(')">(</button>
+                    <button class="btn-function" onclick="appendInput(')')">)</button>
+                    <button class="btn-function" onclick="appendInput('abs(')">abs</button>
+                </div>
+
+                <!-- Number Pad & Operators (Right side of keys) -->
+                <div class="numpad">
+                    <button class="btn-clear" onclick="clearEntry()">CE</button>
+                    <button class="btn-clear" onclick="clearDisplay()">C</button>
+                    <button class="btn-delete" onclick="deleteLast()"><i class="fas fa-backspace"></i></button>
+                    <button class="btn-operator" onclick="appendInput('/')">÷</button>
+
+                    <button onclick="appendInput('7')">7</button>
+                    <button onclick="appendInput('8')">8</button>
+                    <button onclick="appendInput('9')">9</button>
+                    <button class="btn-operator" onclick="appendInput('*')">×</button>
+
+                    <button onclick="appendInput('4')">4</button>
+                    <button onclick="appendInput('5')">5</button>
+                    <button onclick="appendInput('6')">6</button>
+                    <button class="btn-operator" onclick="appendInput('-')">−</button>
+
+                    <button onclick="appendInput('1')">1</button>
+                    <button onclick="appendInput('2')">2</button>
+                    <button onclick="appendInput('3')">3</button>
+                    <button class="btn-operator" onclick="appendInput('+')">+</button>
+
+                    <button onclick="appendInput('0')" style="grid-column: span 2; border-radius: 30px;">0</button>
+                    <button onclick="appendInput('.')">.</button>
+                    <button id="equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Sidebar (Right) -->
+        <div class="history-panel">
+            <div class="history-head">
+                <h2>History Log</h2>
+                <button onclick="clearHistory()" title="Clear History"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <ul id="history-list" class="history-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const resultDiv = document.getElementById('result');
+        const historyList = document.getElementById('history-list');
+        const modeBtn = document.getElementById('mode-toggle');
+        let currentMode = 'deg';
+
+        function appendInput(value) {
+            display.value += value;
+            display.focus();
+        }
+
+        function toggleMode() {
+            if (currentMode === 'deg') {
+                currentMode = 'rad';
+                modeBtn.textContent = 'RAD';
+                modeBtn.style.color = '#ff9a9e';
+            } else {
+                currentMode = 'deg';
+                modeBtn.textContent = 'DEG';
+                modeBtn.style.color = '#00c6ff';
+            }
+        }
+
+        function clearDisplay() {
+            display.value = '';
+            resultDiv.textContent = '';
+            display.focus();
+        }
+
+        function clearEntry() {
+            // Simple implementation: clear current input, but in a real calc this clears just the current number
+            // sticking to simple clear for now or simple delete last
+            display.value = '';
+            display.focus();
+        }
+
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+            display.focus();
+        }
+
+        /* Handle Enter key */
+        display.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                calculate();
+            }
+        });
+
+        async function calculate() {
+            if (display.value.trim() === '') {
+                return;
+            }
+
+            resultDiv.textContent = 'Calculating...';
+
+            try {
+                let expression = display.value;
+
+                // Pre-process expression for backend
+                // Note: We use 'math.radians' in buttons so sin(90) works as degrees which is standard for handhelds, 
+                // but context usually implies radians in programming. 
+                // Let's assume the button inserts the 'math.radians(' part so user just types 90.
+                // If user types manually, they might not type math.radians. 
+                // We'll leave it as is for button clicks.
+
+                // Replace visual symbols
+                expression = expression.replace(/π/g, 'pi');
+                expression = expression.replace(/\^/g, '**');
+
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ expression, mode: currentMode })
+                });
+                const data = await response.json();
+
+                if (data.result.startsWith('Error:')) {
+                    resultDiv.textContent = data.result;
+                    resultDiv.style.color = '#ff5b5b';
+                } else {
+                    resultDiv.textContent = '= ' + data.result;
+                    resultDiv.style.color = '#00ff88';
+                }
+                renderHistory(data.history);
+            } catch (err) {
+                resultDiv.textContent = 'Error connection';
+                resultDiv.style.color = '#ff5b5b';
+            }
+        }
+
+        function renderHistory(history) {
+            historyList.innerHTML = '';
+            if (!history) return;
+            history.forEach(item => {
+                const li = document.createElement('li');
+                const resultClass = item.result.startsWith('Error') ? 'res error' : 'res';
+
+                // Ensure even if expression is empty (which shouldn't happen often), something is shown
+                const exprText = item.expression ? item.expression : '(empty)';
+
+                li.innerHTML = `<span class="expr">${exprText}</span> <span class="${resultClass}">${item.result}</span>`;
+                li.onclick = () => {
+                    display.value = item.expression;
+                    display.focus();
+                };
+                li.title = "Click to reuse";
+                historyList.appendChild(li);
+            });
+            // Scroll to bottom of history
+            historyList.scrollTop = historyList.scrollHeight;
+        }
+
+        async function clearHistory() {
+            await fetch('/clear_history', { method: 'POST' });
+            historyList.innerHTML = '';
+        }
+
+        // Load initial history
+        window.onload = async () => {
+            try {
+                // Need a way to just get history without calc.
+                // Current backend calculate returns history even if empty expression.
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ expression: '' })
+                });
+                const data = await response.json();
+                renderHistory(data.history);
+            } catch (e) {
+                console.error("Failed to load history");
+            }
+        };
+    </script>
+</body>
+
+</html>

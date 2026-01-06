@@ -1,0 +1,367 @@
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap');
+
+body {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    box-sizing: border-box;
+    overflow: auto;
+    /* Allow scroll if needed on very small screens */
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Glassmorphism Main Container */
+.calculator {
+    display: flex;
+    flex-direction: row;
+    /* Horizontal Layout */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 0;
+    width: 900px;
+    max-width: 95vw;
+    height: 600px;
+    /* Fixed height for consistent look */
+    overflow: hidden;
+}
+
+/* Left Panel: Main Calculator */
+.main-calc {
+    flex: 2;
+    /* Takes 2/3 of space */
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: left;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+.btn-mode {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #00c6ff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.btn-mode:hover {
+    background: rgba(0, 198, 255, 0.2);
+    color: #fff;
+}
+
+/* Display */
+#display {
+    width: 100%;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #00ff88;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    text-align: right;
+    padding: 0 15px;
+    margin-bottom: 15px;
+    /* Adjust spacing */
+    box-sizing: border-box;
+    outline: none;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+#display:focus {
+    border-color: #0072ff;
+    box-shadow: 0 0 10px rgba(0, 114, 255, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#result {
+    min-height: 30px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    color: #ffd700;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Keys Container: Split into Sci and Num */
+.keys-container {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+}
+
+.scientific-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    flex: 1;
+}
+
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    flex: 1.2;
+}
+
+button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0;
+    /* Let grid determine height */
+    font-size: 1rem;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Specific Button Styles */
+.btn-operator {
+    color: #00c6ff;
+    font-weight: 600;
+}
+
+.btn-function {
+    font-size: 0.85rem;
+    color: #ff9a9e;
+    background: rgba(255, 255, 255, 0.05);
+    /* Slightly darker for functions */
+}
+
+.btn-clear {
+    background: rgba(255, 59, 59, 0.15);
+    color: #ff5b5b;
+}
+
+.btn-clear:hover {
+    background: rgba(255, 59, 59, 0.3);
+}
+
+.btn-delete {
+    background: rgba(255, 166, 0, 0.15);
+    color: #ffb74d;
+}
+
+.btn-delete:hover {
+    background: rgba(255, 166, 0, 0.3);
+}
+
+#equals {
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+    border: none;
+    font-weight: 700;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+}
+
+#equals:hover {
+    background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+}
+
+/* Right Panel: History Sidebar */
+.history-panel {
+    flex: 1;
+    /* Takes 1/3 of space */
+    background: rgba(0, 0, 0, 0.3);
+    /* Darker sidebar */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.history-head h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+.history-head button {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+    /* Fill remaining height */
+    padding-right: 5px;
+    /* Space for scrollbar */
+}
+
+.history-list li {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.history-list li span.expr {
+    display: block;
+    color: #aaa;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    word-break: break-all;
+}
+
+.history-list li span.res {
+    display: block;
+    color: #00ff88;
+    text-align: right;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Highlight Errors in history */
+.history-list li span.error {
+    color: #ff5b5b;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 800px) {
+    .calculator {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        border-radius: 0;
+    }
+
+    .main-calc,
+    .history-panel {
+        width: 100%;
+        border-right: none;
+        flex: none;
+    }
+
+    .main-calc {
+        padding-bottom: 10px;
+    }
+
+    .keys-container {
+        flex-direction: column;
+    }
+
+    .scientific-pad {
+        /* Make scientific pad smaller on mobile/vertical view or hide appropriately */
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .history-panel {
+        height: 300px;
+        /* Fixed height for history on mobile */
+    }
+}
