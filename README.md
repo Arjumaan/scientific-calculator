@@ -6,8 +6,6 @@ Unlike traditional web simple calculators, this project features a **Horizontal 
 
 It runs entirely in the browser (Static Site), making it incredibly fast and easy to deploy.
 
-![Calculator Preview](https://arjumaan.github.io/scientific-calculator/)
-
 ## ✨ Features
 
 - **Advanced UI/UX**: Premium Glassmorphism design with animated backgrounds and neon accents.
