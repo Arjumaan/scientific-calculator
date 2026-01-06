@@ -1,6 +1,8 @@
 # Professional Scientific Calculator
 
-A robust and aesthetically pleasing scientific calculator built with **Flask** (Python) and **Vanilla HTML/CSS/JS**. It features a modern **Glassmorphism** design, advanced mathematical functions, and secure expression evaluation.
+A robust and visually stunning scientific calculator built with **Flask** (Python) and **Vanilla HTML/CSS/JS**. 
+
+Unlike traditional web simple calculators, this project features a **Horizontal Wide-Screen Layout** optimized for desktop productivity, a premium **Glassmorphism** design with animated backgrounds, and a dedicated **History Side-Panel**. It is production-ready with secure input validation and Degree/Radian support.
 
 ![Calculator Preview](https://via.placeholder.com/800x400?text=Run+the+app+to+see+the+beautiful+UI)
 
