@@ -6,7 +6,7 @@ Unlike traditional web simple calculators, this project features a **Horizontal 
 
 It runs entirely in the browser (Static Site), making it incredibly fast and easy to deploy.
 
-![Calculator Preview](https://via.placeholder.com/800x400?text=Run+the+app+to+see+the+beautiful+UI)
+![Calculator Preview](https://arjumaan.github.io/scientific-calculator/)
 
 ## ✨ Features
 
